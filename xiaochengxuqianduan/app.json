@@ -1,0 +1,42 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/user/user",
+    "pages/logs/logs",
+    "pages/test/test"
+  ],
+  "window": {
+    "backgroundTextStyle": "dark",
+    "navigationBarBackgroundColor": "#d9002f",
+    "navigationBarTitleText": "科大校车",
+    "navigationBarTextStyle": "white",
+    "enablePullDownRefresh": false
+  },
+  "tabBar": {
+    "color": "#6e6d6b",
+    "selectedColor": "#dd2727",
+    "borderStyle": "white",
+    "backgroundColor": "#fff",
+    "list": [
+      {
+        "pagePath": "pages/index/index",
+        "iconPath": "images/shou.png",
+        "selectedIconPath": "images/shouu.png",
+        "text": "首页"
+      },
+      {
+        "pagePath": "pages/user/user",
+        "iconPath": "images/icon-user.png",
+        "selectedIconPath": "images/icon-user-active.png",
+        "text": "我的"
+      },
+      {
+        "pagePath": "pages/test/test",
+        "iconPath": "images/icon-user.png",
+        "selectedIconPath": "images/icon-user-active.png",
+        "text": "test"
+      }
+    ]
+  },
+  "sitemapLocation": "sitemap.json"
+}

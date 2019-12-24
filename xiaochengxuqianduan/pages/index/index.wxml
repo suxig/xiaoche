@@ -1,0 +1,16 @@
+ <view class="map_container">
+  <map class="map" id="map" longitude="{{longitude}}" latitude="{{latitude}}" scale="14" show-location="true" markers="{{markers}}" polyline="{{polyline}}"></map>
+  <text>请选择目的地</text>long:{{long}}lai:{{lai}}openid:{{openid}}
+  <text>路线一：</text>
+  <radio-group class="radio-group" bindchange="radioChange1">
+  <label class="radio" wx:for="{{items1}}">
+    <radio value="{{item.name}}" checked="{{item.checked}}"/>{{item.value}}
+  </label>
+</radio-group>
+  <text>路线二：</text>
+  <radio-group class="radio-group" bindchange="radioChange2">
+  <label class="radio" wx:for="{{items2}}">
+    <radio value="{{item.name}}" checked="{{item.checked}}"/>{{item.value}}
+  </label>
+</radio-group>
+</view>
