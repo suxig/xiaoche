@@ -1,0 +1,87 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<title>登录</title>
+	<link href="/static/css/index/login.css" rel="stylesheet">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" /> 
+	<!-- -->
+	<script>var __links = document.querySelectorAll('a');function __linkClick(e) { parent.window.postMessage(this.href, '*');} ;for (var i = 0, l = __links.length; i < l; i++) {if ( __links[i].getAttribute('data-t') == '_blank' ) { __links[i].addEventListener('click', __linkClick, false);}}</script>
+	<script src="/static/js/index/jquery.min.js" type="text/javascript"></script>
+	<script>$(document).ready(function(c) {
+		$('.alert-close').on('click', function(c){
+			$('.message').fadeOut('slow', function(c){
+				$('.message').remove();
+			});
+		});	  
+	});
+	</script>
+</head>
+<body>
+	<!-- contact-form -->	
+	<div class="message warning">
+		<div class="inset">
+			<div class="login-head">
+				<h1>登  录</h1>			
+			</div>
+			<form enctype="multipart/form-data">
+				<li>
+					<input name="account" id="user_name"type="text" class="text" autocomplete="off" value="用户名" onfocus="if(this.value=='用户名')this.value = '';" onblur="if (this.value == '') {this.value = '用户名';}"><span href="#" class=" icon user"></span>
+				</li>
+					<div class="clear"> </div>
+				<li>
+					<input name="password"  id="password" type="password" value="password" onfocus="if(this.value=='password')this.value = '';" onblur="if (this.value == '') {this.value = 'password';}"> <span href="#" class="icon lock"></span>
+				</li>
+				<div class="clear"> </div>
+				<div class="submit">
+					<input type="button" onclick="submitForm()" value="登录" >
+					<div class="clear">  </div>	
+				</div>
+						
+			</form>
+		</div>					
+	</div>
+	<div class="clear"> </div>
+</body>
+<script type="text/javascript" src="/static/admin/lib/layer/2.4/layer.js"></script>
+<script>
+function submitForm(){
+	 var formData = new FormData($('form')[0]);
+		$.ajax({
+			url: '/Login/login',
+			type: 'POST',
+			data: formData,
+			//这两个设置项必填
+			contentType: false,
+			processData: false,
+			dataType: 'jsonp',
+			calback: "callback",
+			cache: false,
+			success: function (data) {
+			　　if(data['status']=='200'){
+					//在原有窗口打开
+					layer.msg(data['msg'],{icon:1,time:1000});
+					setTimeout(function(){
+						window.location.href = "/Index";
+					},1000);
+				}else if(data['status']=='1000'){
+					//在原有窗口打开
+					layer.msg(data['msg'],{icon:1,time:1000});
+					setTimeout(function(){
+						window.location.href = "/Admin_home";
+					},1000);
+				}else{
+					layer.msg(data['msg'],{icon:2,time:1000});
+				}
+			},
+			error: function (XMLHttpRequest, textStatus, errorThrown) {
+					console.log(XMLHttpRequest.status);
+					console.log(XMLHttpRequest.readyState);
+					console.log(textStatus);
+			}
+      });
+			
+}
+</script>
+</html>

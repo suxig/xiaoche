@@ -1,0 +1,72 @@
+﻿{extend name="index/index"/}
+{block name='title'}{$title}-周恩财|Geticsen{/block}
+{block name="css"}
+  <link rel="stylesheet" type="text/css" href="/static/css/index/jquery.eeyellow.Timeline.css" />
+  <link href="__GETICSEN__/static/css/index/base.css" rel="stylesheet">
+  <link href="__GETICSEN__/static/css/index/index.css" rel="stylesheet">
+  <link href="__GETICSEN__/static/css/index/m.css" rel="stylesheet">
+  <link href="__GETICSEN__/static/css/index/about.css" rel="stylesheet">
+{/block}
+{block name="content-left"}
+  <main class="l_box" style="width: 100%;">
+     <div class="about">
+      <p>我是谁呢？？，说了名字你也不知道我是谁，如果你不是手机浏览麻烦看一下右上角有我的名字人嘛！总是要给一个定义才好心安理得的生活，不过这年头也不是什么都要往自己头上扣，那谁又会知道你原本是什么样子呢？遵从自己的内心就好了</p>
+      <br/>
+      <p>好了那我是谁呢？？，开始贴标签了啊！我是一个狮子座偏爱哲学思考的理工科专业出生的程序猿，不怎么穿格子衫，不喜欢特步（和特步没有仇恨），人没姚明高，没刘翔快，但是可以和郭德纲比帅！，你能看完这里那也是真爱。</p>
+      <br/>
+      <p>2016年入了计算机的坑从那时候开始就没少往外爬，好在天资聪颖(傻)，读完几本书看了几部分视频也就算了入了门，2017年开始做网站，你看到的这个网站使用的是thinkphp5框架写的，后端所有代码全部自己完成，怎奈现在的代码太乱，等我重构之后就开源吧。</p>
+    </div>
+    <div style="width: 100%;background: #fff;margin-bottom: 10px;padding: 2%;">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="VivaTimeline">
+						<dl>
+						{volist name="times" id="time"}
+							<dt>{$key}年</dt>
+							{volist name="time" id="item"}
+									<dd class="pos-{$item.left==true?'left':'right'} clearfix">
+										<div class="circ"></div>
+										<div class="time">{$item.time_create_time|backMothDay}</div>
+										<div class="events">
+											<div class="events-header">{$item.time_title}</div>                                
+											<div class="events-body">                                                                                            
+												<div class="row">
+												{if condition="$item.time_pic!='' or $item.time_pic!=null"}
+													<div class="col-md-6 pull-left">
+														<img class="events-object img-responsive img-rounded" src="{$item.time_pic}" />
+													</div>
+												{/if}
+													<div class="events-desc">
+														{$item.time_content}
+													</div>
+												</div>                                   
+											</div>   
+											<div class="events-footer">
+												{$item.time_desc==''?'':$item.time_desc}	
+											</div>                               
+										</div>
+									</dd>
+							{/volist}
+						{/volist}
+	                    </dl>
+					</div>
+				</div>
+			</div>
+		</div>
+  </main>
+{/block}
+{block name="content-right"}
+{/block}
+{block name="script"}
+<script type="text/javascript" src="__GETICSEN__/static/library/jquery/1.9.1/jquery.min.js"></script> 
+<script type="text/javascript" src="/static/library/bootstrap-3.3.6/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="/static/js/index/jquery.eeyellow.Timeline.js"></script>
+<script type="text/javascript">
+		$(document).ready(function(){
+			$('.VivaTimeline').vivaTimeline({
+				carousel: true,
+				carouselTime: 3000
+			});
+		});
+</script>
+{/block}

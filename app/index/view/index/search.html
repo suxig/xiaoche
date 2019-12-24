@@ -1,0 +1,83 @@
+﻿{extend name="index/index" /}
+{block name='title'}
+  {$keywords}
+{/block}
+{block name='keywords'}
+  {$keywords}
+{/block}
+{block name='description'}
+  {$keywords}
+{/block}
+{block name="content-left"}
+<main class="l_box">
+    <li>
+        <h3><center><a>共搜索到{$article|count}文章</a></center></h3>
+    </li>
+    {volist name="article" id="item"}
+      {if condition="$item.article_pic_url eq null or $item.article_pic_url eq ''"}
+        <li>
+            <h3><a href="/Index/article/content/{$item.id}.html" target="blank">{$item.article_title}</a></h3>
+            <p>{$item.article_summary}</p>
+            <div class="article-footer">
+                <i class="iconfont icon-riqi" style="color:rgb(62, 118, 240);"> {$item.article_last_update|backDate}</i>
+                <i class="iconfont icon-chakan" style="color:rgb(62, 118, 240);"> {$item.article_view_num}</i>
+                <i class="iconfont icon-biaoqian" style="color:rgb(62, 118, 240);" > <span style="background: #1d953f;width: auto;color: white;border-radius: 5px;font-size: 13px;margin-left:5px;padding:1px;">{$item.article_type}</span></i>
+            </div>
+        </li>
+      {else/}
+        <li>
+            <span><a href="/Index/article/content/{$item.id}.html" target="blank"><img src="{$item.article_pic_url|backArray|backImg=###,0}"></a></span>
+            <h3><a href="/Index/article/content/{$item.id}.html" target="blank">{$item.article_title}</a></h3>
+            <p>{$item.article_summary}</p>
+            <div class="article-footer">
+                <i class="iconfont icon-riqi" style="color:rgb(62, 118, 240);"> {$item.article_last_update|backDate}</i>
+                <i class="iconfont icon-chakan" style="color:rgb(62, 118, 240);"> {$item.article_view_num}</i>
+                <i class="iconfont icon-biaoqian" style="color:rgb(62, 118, 240);" ><span style="background: #1d953f;width: auto;color: white;border-radius: 5px;font-size: 13px;margin-left:5px;padding:1px;">{$item.article_type} </span></i>
+            </div>
+        </li>
+      {/if}
+  {/volist}
+</main>
+{/block}
+{block name="content-right"}
+<aside class="r_box">
+    <div class="search">
+      <form  method="post" name="searchform" id="searchform">
+        <input name="keywords" id="keyboard" autocomplete="off" class="input_text" value="{$keywords}" style="color: rgb(153, 153, 153);" onfocus="if(value=='请输入关键字词'){this.style.color='#000';value=''}" onblur="if(value==''){this.style.color='#999';value='请输入关键字词'}" type="text">
+        <input name="Submit" class="input_submit" value="搜索" type="submit">
+      </form>
+    </div>
+    <div class="contect">
+      <ul>
+       <span><a href="https://wpa.qq.com/msgrd?v=3&uin={$host.QQ}&site=qq&menu=yes"><i class="iconfont icon-qq" style="color:#1296db;" ></i></a></span>
+       <span><a href="{$host.Github}"><i class="iconfont icon-GitHub" style="color:#000;" ></i></a></span>
+       <span><a href="#weixin"><i class="iconfont icon-weixin" style="color:#1afa29;" ></i></a></span>
+      </ul>
+    </div>
+    <div class="cloud">
+      <h2>标签云</h2>
+      <ul>
+        {volist name="labels" id="label" key="k"}
+        <a href="/Index/label/content/{$key}.html">{$label}</a>
+        {/volist}
+      </ul>
+    </div>
+    <div class="links">
+      <h2>友情链接</h2>
+      <ul>
+        {volist name="friends" id="friend"}
+            <a href="{$friend.friend_link_url}">{$friend.friend_link_name}</a>
+        {/volist}
+      </ul>
+    </div>
+    <div class="guanzhu">
+      <h2>关注我 么么哒</h2>
+      <ul>
+        <a name="weixin">
+          <img src="/static/images/common/weixin.png">
+        </a>
+      </ul>
+    </div>
+</aside>
+{/block}
+{/block}

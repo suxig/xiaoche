@@ -1,0 +1,43 @@
+﻿{extend name="index/index" /}
+{block name='js'}
+<script src="/static/js/index/scrollReveal.js"></script>
+{/block}
+{block name='content'}
+<article>
+    <div class="timebox">
+        <ul id="list">
+          {volist name="articles" id="article"}
+          <li><span>{$article.article_create_time|backDate}</span><a href="/Index/article/content/{$article.id}.html" title="{$article.article_title}">{$article.article_title}</a></li>
+          {/volist}
+        </ul>
+    </div>
+    <div class="pagelist">
+      {if condition="$page neq 1"}
+          <a  href="/{$property}/index/page/1.html" title="Total record">首页</a>&nbsp;
+      {/if}
+      {if condition="$page gt 1"}
+        <a  href="/{$property}/index/page/{$page-1}.html" title="Total record">上一页</a>&nbsp;
+      {/if}
+      {if condition="$page neq $end"}
+          <a href="/{$property}/index/page/{$page}.html"><b>{$page}</b></a>&nbsp;
+      {/if}
+      {if condition="($end -$page ) gt 6"}
+          {for start="$page+1" end="$page+6" step="1" name="i"} 
+              <a href="/{$property}/index/page/{$i}.html">{$i}</a>&nbsp;
+          {/for}
+      {else/}
+          {for start="$page+1" end="$end+1" step="1" name="i"} 
+              <a href="/{$property}/index/page/{$i}.html">{$i}</a>&nbsp;
+          {/for}
+      {/if}
+      {if condition="$page lt $end"}
+        <a href="/{$property}/index/page/{$page+1}.html">下一页</a>&nbsp;
+      {/if}
+      {if condition="$page neq $end"}
+        <a href="/{$property}/index/page/{$end}.html">尾页</a>
+      {/if}
+  </div>
+</article>
+{/block}
+{block name='script'}
+{/block}

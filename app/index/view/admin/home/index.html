@@ -1,0 +1,142 @@
+{extend name="common/admin" /}
+{block name="admin-main"}
+<div>
+    <article class="cl pd-20">
+        <table class="table table-border table-bordered table-bg">
+            <thead>
+                    <tr>
+                        <th colspan="7" scope="col">信息统计</th>
+                    </tr>
+                    <tr class="text-c">
+                        <th>统计</th>
+                        <th>用户</th>
+                        <th>文章</th>
+                        <th>评论</th>
+                        <th>访问量</th>
+                        <th>管理员</th>
+                    </tr>
+            </thead>
+            <tbody>
+                <tr class="text-c">
+                        <td>今日</td>
+                        <td>92</td>
+                        <td>9</td>
+                        <td>0</td>
+                        <td>8</td>
+                        <td>20</td>
+                </tr>
+                <tr class="text-c">
+                        <td>昨日</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                </tr>
+                <tr class="text-c">
+                        <td>本周</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                </tr>
+                <tr class="text-c">
+                        <td>本月</td>
+                        <td>2</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                 </tr>
+                 <tr class="text-c">
+                        <td>本季度</td>
+                        <td>2</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                        <td>0</td>
+                 </tr>
+        </tbody>
+    </table>
+    </article>
+    <div style="height:330px;width:100%;" id="web">
+    </div>
+</div>
+{/block}
+{block name="script"}
+<script type="text/javascript" src="/static/library/echarts/echarts.min.js"></script> 
+<script>
+// 基于准备好的dom，初始化echarts实例
+var myChart = echarts.init(document.getElementById('web'));
+myChart.showLoading();
+// 指定图表的配置项和数据
+$.ajax({
+    url: '/Admin_home/getWebArticleMessage',
+    type: 'POST',
+    //这两个设置项必填
+    contentType: false,
+    processData: false,
+    dataType: 'jsonp',
+    calback: "callback",
+    cache: false,
+    success: function (data) {
+    　　if(data['status']=='200'){
+            var  chartData=data["data"];
+            articleChart(chartData);
+        }else{
+            layer.msg(data['msg'],{icon:2,time:1000});
+        }
+    },
+    error: function (XMLHttpRequest, textStatus, errorThrown) {
+        console.log(XMLHttpRequest.status);
+        console.log(XMLHttpRequest.readyState);
+        console.log(textStatus);
+    }
+});
+function articleChart(chartData){
+  myChart.hideLoading();
+  option = {
+    title: {
+        text: '站点文章信息'
+    },
+    tooltip: {
+        trigger: 'axis',
+        axisPointer: {
+            type: 'shadow'
+        }
+    },
+
+    grid: {
+        left: '3%',
+        right: '4%',
+        bottom: '3%',
+        containLabel: true
+    },
+    xAxis: {
+        type: 'value',
+        boundaryGap: [0, 0.01]
+    },
+    yAxis: {
+        type: 'category',
+        data: ['本周','上周','本月','本季度','本年度','总数']
+    },
+    series: [
+        {
+            type: 'bar',
+            label: {
+                normal: {
+                    show: true,
+                    position: 'insideRight'
+                }
+            },
+            data: chartData
+        }
+    ]
+    };
+	myChart.setOption(option);	
+}
+		
+
+</script>
+{/block}

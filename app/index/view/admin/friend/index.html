@@ -1,0 +1,146 @@
+{extend name="common/admin" /}
+{block name="admin-main"}
+<div class="cl pd-5 bg-1 bk-gray mt-20">
+        <span class="r">共有数据：<strong>{$friends|count}</strong> 条</span>
+</div>
+<table class="table table-border table-bordered table-bg">
+    <thead>
+        <tr>
+            <th class="text-c" scope="col" colspan="9">友链申请列表</th>
+        </tr>
+        <tr class="text-c">
+            <th><input type="checkbox" name="" value=""></th>
+            <th>ID</th>
+            <th class="hidden-xs">网站网址</th>
+            <th>网站名</th>
+            <th class="hidden-xs">网站描述</th>
+            <th>头像地址</th>
+            <th class="hidden-xs">申请时间</th>
+            <th class="hidden-xs">网站类型</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    <tbody>
+    
+    {volist name="friends" id="friend"}
+        <tr class="text-c">
+            <td><input type="checkbox" value="{$friend.id}" name=""></td>
+            <td>{$friend.id}</td>
+            <td class="hidden-xs">{$friend.friend_link_url}</td>
+            <td>{$friend.friend_link_name}</td>
+            <td class="hidden-xs">{$friend.friend_link_desc|mb_substr=0,20,'utf-8'}</td>
+            <td><img  src="{$friend.friend_link_head_url}"width="40px;" height="40px;" alt="{$friend.id}"></td>
+            <td class="hidden-xs">{$friend.friend_link_create_time}</td>
+            <td class="hidden-xs">{$friend.friend_link_type}</td>
+            <td class="f-14 td-manage">
+                <a style="text-decoration:none" onClick="friend_publish(this,'{$friend.id}')" href="javascript:;" title="发布"><i class="Hui-iconfont">&#xe603;</i></a>
+                <a style="text-decoration:none" class="ml-5"  onclick="editFriend('{$friend.id}')" title="编辑"><i class="Hui-iconfont">&#xe6df;</i></a>
+                <a style="text-decoration:none" class="ml-5" onClick="article_del(this,'{$friend.id}')" href="javascript:;" title="删除"><i class="Hui-iconfont">&#xe6e2;</i></a>
+            </td>
+        </tr>
+    {/volist} 
+    </tbody>
+</table>
+<div class="cl pd-5 bg-1 bk-gray"style="display: flex;">
+	<div style="margin:5px auto;display: flex;">
+		{if condition="$page neq 1"}
+			<a  class="btn btn-secondary radius" href="/{$property}/page/1.html" title="Total record">首页</a>
+        {/if}
+        {if condition="$page gt 1"}
+			<a class="btn btn-default" href="/{$property}/page/{$page-1}.html" title="Total record">上一页</a>
+        {/if}
+        {if condition="$page neq $end"}
+			<a  class="btn btn-default" href="/{$property}/page/{$page}.html"><b>{$page}</b></a>
+        {/if}
+        {if condition="($end -$page ) gt 6"}
+            {for start="$page+1" end="$page+6" step="1" name="i"} 
+			<a class="btn btn-default" href="/{$property}/page/{$i}.html">{$i}</a>
+            {/for}
+        {else/}
+            {for start="$page+1" end="$end+1" step="1" name="i"} 
+			<a class="btn btn-default" href="/{$property}/page/{$i}.html">{$i}</a>
+            {/for}
+        {/if}
+        {if condition="$page lt $end"}
+			<a class="btn btn-default" href="/{$property}/page/{$page+1}.html">下一页</a>
+        {/if}
+        {if condition="$page neq $end"}
+			<a class="btn btn-secondary radius" href="/{$property}/page/{$end}.html">尾页</a>
+        {/if}
+    </div>
+</div>
+{/block}
+{block name="script"}
+<script type="text/javascript" src="/static/admin/lib/My97DatePicker/4.8/WdatePicker.js"></script> 
+<script type="text/javascript" src="/static/admin/lib/datatables/1.10.0/jquery.dataTables.min.js"></script> 
+<script type="text/javascript" src="/static/admin/lib/laypage/1.2/laypage.js"></script> 
+<script type="text/javascript">
+function friend_publish(obj,id)
+{
+	layer.confirm('确认要发布吗？',function(index){
+		$.ajax({
+			type: 'POST',
+            url: '/Admin_friend/publish/id/'+id,
+			data: {},
+			//这两个设置项必填
+			contentType: false,
+			processData: false,
+			success: function(data){
+				console.log(data);
+				$(obj).parents("tr").find(".td-manage").prepend('<a style="text-decoration:none" onClick="article_unPublish(this,'+id+')" href="javascript:;" title="下架"><i class="Hui-iconfont">&#xe6de;</i></a>');
+				$(obj).parents("tr").find(".td-status").html('<span class="label label-success radius">已发布</span>');
+				$(obj).parent().parent().remove();
+				layer.msg('已发布!',{icon: 1,time:1000});
+			},
+			error:function(data) {
+				console.log(data.msg);
+			},
+		});	
+	});
+}
+function editFriend(id){
+     //iframe层
+     layer.open({
+        title:"修改",
+        type: 2,
+        content: '/Admin_friend/edit/id/'+id   //content可以是字符串，可以是DOM，也可以是一个URL
+        ,btn: ['确认', '取消']
+        ,area: ['450px', '350px']
+        ,yes: function(index, layero){
+            //按钮【按钮一】的回调
+            var formData = new FormData($(window.frames[0].document).find("form")[0]);
+            $.ajax({
+                type: 'POST',
+                url: '/Admin_friend/edit/id/'+id,
+                data: formData,
+                //这两个设置项必填
+                contentType: false,
+                processData: false,
+                dataType: 'jsonp',
+			    calback: "callback",
+                success: function(data){
+                    console.log(data);
+                    layer.msg(data['msg'],{icon: 1,time:1000});
+                    layer.close(index);
+                },
+                error:function(data) {
+                    console.log(data.msg);
+                },
+            });	
+        }
+        ,no: function(index, layero){
+            //按钮【按钮二】的回调
+            layer.close(index);
+            return false
+            //return false 开启该代码可禁止点击该按钮关闭
+        }
+        ,cancel: function(){ 
+            //右上角关闭回调
+            
+            //return false 开启该代码可禁止点击该按钮关闭
+        }
+    });
+   
+}
+</script> 
+{/block}

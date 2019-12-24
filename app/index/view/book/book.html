@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>{$book.book_title}{$title==""?"":"-".$title}</title>
+	<meta name="renderer" content="webkit">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+	<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+	<link rel="stylesheet" href="__GETICSEN__/static/library/layui/css/layui.css"  media="all">
+	<link rel="stylesheet" type="text/css" href="__GETICSEN__/static/library/ueditor/1.4.3/third-party/SyntaxHighlighter/styles/shCore.css">
+	<link rel="stylesheet" type="text/css" href="__GETICSEN__/static/library/ueditor/1.4.3/third-party/SyntaxHighlighter/styles/shThemeFadeToGrey.css">
+	<style type="text/css">
+	 .layui-side::-webkit-scrollbar {
+		display: none;
+	 }
+	 .layui-nav-item .layui-nav-child  dd{margin-left: 20px;}
+	</style>
+</head>
+<body>
+		<div class="layui-layout layui-layout-admin">
+		  <div class="layui-header" >
+				<div class="layui-logo"><h2>{$book.book_title}</h2></div>
+				<ul class="layui-nav layui-layout-right">
+					<li class="layui-nav-item">作者:</li>
+					<li class="layui-nav-item">
+						<a href="javascript:;">
+							<img src="{$user.user_head}" class="layui-nav-img">
+							{$user.user_name}
+						</a>
+					</li>
+				</ul>
+		  </div>
+		  <div class="layui-side layui-bg-black">
+			<div class="layui-side-scroll" style="padding-top: 20px;">
+			  <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+			  <ul class="layui-nav layui-nav-tree"  lay-filter="test">
+			  {volist name="chapters" id="chapter"}
+					{if condition="count($chapter.childs) eq 0 "}
+						<li class="layui-nav-item {$chapter.this}"><a style="display: inline-block;" href="/Books/show/bookId/{$book.book_id}/chapterId/{$chapter.book_chapter_id}.html">{$chapter.book_title}</a></li>
+					{else/}
+						<li class="layui-nav-item layui-nav-itemed">
+							<a class="{$chapter.this}" href="/Books/show/bookId/{$book.book_id}/chapterId/{$chapter.book_chapter_id}.html">{$chapter.book_title}</a>
+							<dl class="layui-nav-child">
+								{volist name="chapter.childs" id="item"}
+								<dd class="{$item.this}"><a href="/Books/show/bookId/{$book.book_id}/chapterId/{$item.book_chapter_id}.html">{$item.book_title}</a></dd>
+								{/volist}
+							</dl>
+						</li>
+				   {/if}
+			  {/volist}
+			  </ul>
+			</div>
+		  </div>
+		  <div class="layui-body">
+				<!-- 内容主体区域 -->
+				<div style="padding: 20px;">
+					{$content}
+			  </div>
+		  </div>
+		  
+		  <div class="layui-footer layui-center">
+			© Geticsen.cn
+		  </div>
+		</div>
+<script src="__GETICSEN__/static/library/layui/layui.js" charset="utf-8"></script>
+<script type="text/javascript" src="__GETICSEN__/static/library/jquery/1.9.1/jquery.min.js"></script> 
+<script type="text/javascript" src="__GETICSEN__/static/admin/lib/layer/2.4/layer.js"></script>
+<script type="text/javascript" src="__GETICSEN__/static/library/ueditor/1.4.3/third-party/SyntaxHighlighter/scripts/XRegExp.js"></script>
+<script type="text/javascript" src="__GETICSEN__/static/library/ueditor/1.4.3/third-party/SyntaxHighlighter/scripts/shCore.js"></script>
+<script type="text/javascript" src="__GETICSEN__/static/library/ueditor/1.4.3/third-party/SyntaxHighlighter/scripts/shBrushJava.js"></script>
+<script type="text/javascript" src="__GETICSEN__/static/library/ueditor/1.4.3/third-party/SyntaxHighlighter/scripts/shBrushJScript.js"></script>
+<script type="text/javascript" src="__GETICSEN__/static/library/ueditor/1.4.3/third-party/SyntaxHighlighter/scripts/shBrushSql.js"></script>
+<script type="text/javascript" src="__GETICSEN__/static/library/ueditor/1.4.3/third-party/SyntaxHighlighter/scripts/shBrushPhp.js"></script>
+<script type="text/javascript" src="__GETICSEN__/static/library/ueditor/1.4.3/third-party/SyntaxHighlighter/scripts/shBrushPython.js"></script>
+<script type="text/javascript" src="__GETICSEN__/static/library/ueditor/1.4.3/third-party/SyntaxHighlighter/scripts/shBrushXml.js"></script>
+<script type="text/javascript" src="__GETICSEN__/static/library/ueditor/1.4.3/third-party/SyntaxHighlighter/scripts/shBrushCpp.js"></script>
+<script type="text/javascript" src="__GETICSEN__/static/library/ueditor/1.4.3/third-party/SyntaxHighlighter/scripts/shBrushCss.js"></script>
+<script>
+//JavaScript代码区域
+SyntaxHighlighter.all();
+layui.use('element', function(){
+	var element = layui.element;
+});
+//图片添加点击事件
+$(".layui-body  img").click(function(){
+  //自定页
+  layer.open({
+    type: 1,
+    title:this.alt,
+    area: ['90%', '90%'],
+    closeBtn: 0, //不显示关闭按钮
+    anim: 2,
+    shadeClose: true, //开启遮罩关闭
+    content: '<img src="'+this.src+'" style="width:100%;">',
+    btn: ['关闭'],
+		btn1:function(index, layero){
+			// 按钮1的逻辑
+      layer.close(index);
+		},
+    cancel: function(){ 
+            //右上角关闭回调
+            
+            //return false 开启该代码可禁止点击该按钮关闭
+    }
+  });
+});
+</script>
+</body>
+</html>

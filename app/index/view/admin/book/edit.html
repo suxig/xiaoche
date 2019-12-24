@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>在线书页</title>
+		<meta name="renderer" content="webkit">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<meta name="apple-mobile-web-app-status-bar-style" content="black"> 
+		<meta name="apple-mobile-web-app-capable" content="yes">
+		<meta name="format-detection" content="telephone=no">
+		<link rel="stylesheet" href="/static/library/layui/css/layui.css"  media="all">
+		<style>
+		 .layui-nav-item .layui-nav-child  dd{margin-left: 20px;}
+		</style>
+	</head>
+	<body>
+		  <div class="layui-layout layui-layout-admin">
+		  <div class="layui-header">
+				<div class="layui-logo"><h2>{$book.book_title}</h2></div>
+				{if condition="$loginList.isLogin eq true"}
+					<ul class="layui-nav layui-layout-right">
+						<li class="layui-nav-item">
+							<a href="javascript:;">
+								<img src="{$loginList.userList.user_head_url}" class="layui-nav-img">
+								{$loginList.userList.user_name}
+							</a>
+						</li>
+					</ul>
+				{/if}
+		  </div>
+		  
+		  <div class="layui-side layui-bg-black" style="padding-top: 20px;">
+			<div class="layui-side-scroll">
+			  <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+			  <ul class="layui-nav layui-nav-tree"  lay-filter="test">
+               {volist name="chapters" id="chapter"}
+					{if condition="count($chapter.childs) eq 0 "}
+						<li class="layui-nav-item {$chapter.this}"><a style="display: inline-block;" href="/Admin_book/edit/content/{$book.book_id}/chapterId/{$chapter.book_chapter_id}.html">{$chapter.book_title}</a><i  onclick="addChapter('{$book.book_id}','{$chapter.book_chapter_id}')" class="layui-icon layui-layout-right" style="color: brown;margin-right: 10px;">&#xe61f;</i></li>
+					{else/}
+						<li class="layui-nav-item layui-nav-itemed">
+							<a class="{$chapter.this}" href="/Admin_book/edit/content/{$book.book_id}/chapterId/{$chapter.book_chapter_id}.html">{$chapter.book_title}</a>
+							<dl class="layui-nav-child">
+								{volist name="chapter.childs" id="item"}
+								<dd class="{$item.this}"><a href="/Admin_book/edit/content/{$book.book_id}/chapterId/{$item.book_chapter_id}.html">{$item.book_title}</a></dd>
+								{/volist}
+								<dd><a onclick="addChapter('{$book.book_id}','{$chapter.book_chapter_id}')" style="color: brown;"><i class="layui-icon">&#xe61f;</i>  增加小节</a></dd>
+							</dl>
+						</li>
+					{/if}
+				{/volist}
+				<li class="layui-nav-item"><a onclick="addChapter('{$book.book_id}',0)" style="color: brown;"><i class="layui-icon">&#xe61f;</i>  增加章节</a></li>
+			  </ul>
+			</div>
+		  </div>
+		  <div class="layui-body layui-bg-gray">
+			<!-- 内容主体区域 -->
+				<div style="padding: 20px;" >
+						<form>
+								<div style="display: flex;width: 90%;justify-content: center;margin-top: 10px;">  
+									<label class="layui-form-label">本节标题</label>
+									<input class="layui-input"  value="{$title}"name="book_title" type="text"/>
+								</div>
+								<center><h2>请编辑内容</h2></center>
+								<hr class="layui-bg-green">
+								<textarea id="editor" type="text/plain" name="content"style="width:100%;height:530px;"></textarea> 
+								<hr class="layui-bg-green">
+								<center>
+									<div style="width: 100%;">
+										<div class="layui-inline">
+												<button type="button" onclick="submitFrom('{$book.book_id}','{$chapterId}')"class="layui-btn">提交</button>
+												<button type="button" class="layui-btn">存稿</button>
+												<button type="button" class="layui-btn">删除</button>
+										</div>
+									</div>
+								</center>
+								
+						</form>
+			  </div>
+		  </div>
+		  
+		  <div class="layui-footer layui-center">
+				<!-- 底部固定区域 -->
+				© geticsen-Book
+		  </div>
+		</div>
+		<script src="/static/library/layui/layui.js" charset="utf-8"></script>
+		<script type="text/javascript" src="/static/library/jquery/1.9.1/jquery.min.js"></script> 
+		<script type="text/javascript" src="/static/admin/lib/layer/2.4/layer.js"></script>
+		<script type="text/javascript" src="/static/library/ueditor/1.4.3/ueditor.config.js"></script> 
+		<script type="text/javascript" src="/static/library/ueditor/1.4.3/ueditor.all.js"> </script> 
+		<script type="text/javascript" src="/static/library/ueditor/1.4.3/lang/zh-cn/zh-cn.js"></script>
+		<script>
+		layui.use('element', function(){
+		  var element = layui.element;
+		  
+		});
+		var articleData="";
+		function getArticleContent(){
+			$.ajax({
+				url: '/Admin_book/getBookContent/bookId/{$book.book_id}/chapterId/{$chapterId}',
+				type: 'POST',
+				//这两个设置项必填
+				contentType: false,
+				processData: false,
+				dataType: 'jsonp',
+				calback: "callback",
+				cache: false,
+				success: function (data) {
+					　　if(data['status']=='200'){
+							//在原有窗口打开
+							articleData = data['data'];
+						
+						}else{
+							layer.msg(data['msg'],{icon:2,time:1000});
+						}
+				},
+				error: function (XMLHttpRequest, textStatus, errorThrown) {
+							console.log(XMLHttpRequest.status);
+							console.log(XMLHttpRequest.readyState);
+							console.log(textStatus);
+				}
+				});
+					
+		}
+		getArticleContent();
+		$(function(){
+				var editor = UE.getEditor('editor',{autoHeightEnabled: false});
+				editor.ready(function() {
+					editor.ready(function() {
+						editor.setContent(articleData);
+					});
+				});	
+		});
+
+		function addChapter(bookId,chapterId){
+			//alert(bookId+"  "+chapterId);
+			layer.open({
+				title:"增加",
+				type: 2,
+				content: '/Admin_book/addChapterView/bookId/'+bookId+"/chapterId/"+chapterId,
+				area: ['30%', '20%'],
+				cancel: function(){ 
+					//右上角关闭回调
+					
+					//return false 开启该代码可禁止点击该按钮关闭
+				}
+			});
+		}
+		function submitFrom(bookId,chapterId){
+			var formData = new FormData($('form')[0]);
+			$.ajax({
+				url: '/Admin_book/save/bookId/'+bookId+"/chapterId/"+chapterId,
+				type: 'POST',
+				data: formData,
+				//这两个设置项必填
+				contentType: false,
+				processData: false,
+				dataType: 'jsonp',
+				calback: "callback",
+				cache: false,
+				success: function (data) {
+				　　if(data['status']=='200'){
+						//在原有窗口打开
+						layer.msg(data['msg'],{icon:1,time:1000});
+					
+					}else{
+						layer.msg(data['msg'],{icon:2,time:1000});
+					}
+				},
+				error: function (XMLHttpRequest, textStatus, errorThrown) {
+						console.log(XMLHttpRequest.status);
+						console.log(XMLHttpRequest.readyState);
+						console.log(textStatus);
+				}
+			});
+		}
+		</script>
+	</body>
+</html>

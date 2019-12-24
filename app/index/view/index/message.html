@@ -1,0 +1,112 @@
+﻿
+{extend name="index/index" /}
+{block name="css"}
+<link href="/static/library/layui/css/layui.css" rel="stylesheet">
+{/block}
+{block name="content-left"}
+<main class="l_box">
+  <div class="gbook" id="comment">
+        <div class="gbox">
+            {if condition="$loginList.isLogin eq true"}
+            <form>
+              <div id="plpost">
+                
+                <textarea id="remarkEditor" name="article_comment" ></textarea>
+                <input name="imageField" type="button" onclick="submitForm('-1','{$loginList.userList.user_id}','{$loginList.userList.user_name}','{$loginList.userList.user_head_url}','-1')" value="提交">
+              </div>
+            </form>
+            {else/}
+              <div style="display: flex;justify-content: center;"><h1><a href="/Login/qq">登录即可留言</a></h1></div>
+            {/if}
+        </div>
+        {volist name="comments" id ="comment"}
+        <div class="fb">
+          <ul style="background: url({$comment.user.user_head}) no-repeat top 20px left 10px;background-size:50px 50px;">
+            <p class="fbtime"><span>{$comment.comment_create_time}</span>{$comment.user.user_name}</p>
+            <p class="fbinfo">{$comment.comment_content}</p>
+          </ul>
+        </div>
+        {/volist}
+  </div>
+</main>
+{/block}
+{block name="script"}
+{if condition="$loginList.isLogin eq true"}
+<script type="text/javascript" src="/static/library/layui/layui.js"></script>
+<script type="text/javascript" src="/static/admin/lib/layer/2.4/layer.js"></script>
+<script type="text/javascript">
+  var $;
+  var layer;
+  var index;
+  var layedit;
+  layui.use(['layer', 'jquery','form','layedit'], function () {
+      $ = layui.$;
+      layer = layui.layer;
+      layedit = layui.layedit;
+
+      /**建立编辑器*/
+      index = layedit.build('remarkEditor',{
+          height: 150, //设置编辑器高度
+          tool: ['left','center','right','|','link','unlink','|','face']
+      });
+  });
+function submitForm(article_id,user_id,user_name,user_head,author_id){
+			var formData = new FormData();
+      formData.append("article_id",article_id);
+      formData.append("user_id",user_id);
+      formData.append("article_comment",layedit.getContent(index));
+			$.ajax({
+          url: '/Message/submitMessage',
+          type: 'POST',
+					data: formData,
+					//这两个设置项必填
+					contentType: false,
+					processData: false,
+          dataType: 'jsonp',
+          calback: "callback",
+          cache: false,
+          success: function (data) {
+          　　if(data['status']=='200'){
+                  //在原有窗口打开
+                  var d=new Date();
+                  var year=d.getFullYear();
+                  var month=change(d.getMonth()+1);
+                  var day=change(d.getDate());
+                  function change(t){
+                    if(t<10){
+                       return "0"+t;
+                    }else{
+                       return t;
+                    }
+                  }
+                  
+                  var time=year+'-'+month+'-'+day;
+                  var Oli = '<div class="fb">'+
+                              '<ul style="background: url('+user_head+') no-repeat top 20px left 10px;background-size:50px 50px;">'+
+                                '<p class="fbtime"><span>'+time+'</span>'+user_name+'</p>'+
+                                '<p class="fbinfo">'+layedit.getContent(index)+'</p>'+
+                              '</ul>'+
+                            '</div>';
+                  $("#comment").append(Oli);
+                  /**刷新编辑器*/
+                  index = layedit.build('remarkEditor',{
+                      height: 150, //设置编辑器高度
+                      tool: ['left','center','right','|','link','unlink','|','face']
+                  });
+                  layer.msg(data['msg'],{icon:1,time:1000});
+              
+              }else{
+                  layer.msg(data['msg'],{icon:2,time:1000});
+              }
+          },
+          error: function (XMLHttpRequest, textStatus, errorThrown) {
+                  console.log(XMLHttpRequest.status);
+                  console.log(XMLHttpRequest.readyState);
+                  console.log(textStatus);
+          }
+      });
+			
+}
+</script>
+{/if}
+{/block}

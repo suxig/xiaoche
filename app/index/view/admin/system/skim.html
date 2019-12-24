@@ -1,0 +1,60 @@
+{extend name="common/admin" /}
+{block name="admin-main"}
+
+<div class="cl pd-5 bg-1 bk-gray mt-20">
+        <span class="r">共有数据：<strong>{$skims|count}</strong> 条</span>
+</div>
+<table class="table table-border table-bordered table-bg">
+    <thead>
+            <tr>
+                <th class="text-c" scope="col" colspan="12">浏览列表</th>
+            </tr>
+            <tr class="text-c">
+                <th>ID</th>
+                <th>时间</th>
+                <th>ip</th>
+                <th>访问url</th>
+                <th>用户</th>
+            </tr>
+    </thead>
+    <tbody>
+        {volist name="skims" id="skim"}
+        <tr>
+            <td>{$skim.id}</td>
+            <td style="max-width: 110px; overflow: hidden;text-overflow: ellipsis;white-space: nowrap;">{$skim.visit_time}</td>
+            <td class="hidden-xs">{$skim.visit_ip}</td>
+            <td class="hidden-xs">{$skim.visit_url}</td>
+            <td class="hidden-xs">{$skim.visit_user_id}</td>
+        </tr>
+        {/volist} 
+    </tbody>
+</table>
+<div class="cl pd-5 bg-1 bk-gray"style="display: flex;">
+	<div style="margin:5px auto;display: flex;">
+		{if condition="$page neq 1"}
+			<a  class="btn btn-secondary radius" href="/{$property}/page/1.html" title="Total record">首页</a>
+        {/if}
+        {if condition="$page gt 1"}
+			<a class="btn btn-default" href="/{$property}/page/{$page-1}.html" title="Total record">上一页</a>
+        {/if}
+        {if condition="$page neq $end"}
+			<a  class="btn btn-default" href="/{$property}/page/{$page}.html"><b>{$page}</b></a>
+        {/if}
+        {if condition="($end -$page ) gt 6"}
+            {for start="$page+1" end="$page+6" step="1" name="i"} 
+			<a class="btn btn-default" href="/{$property}/page/{$i}.html">{$i}</a>
+            {/for}
+        {else/}
+            {for start="$page+1" end="$end+1" step="1" name="i"} 
+			<a class="btn btn-default" href="/{$property}/page/{$i}.html">{$i}</a>
+            {/for}
+        {/if}
+        {if condition="$page lt $end"}
+			<a class="btn btn-default" href="/{$property}/page/{$page+1}.html">下一页</a>
+        {/if}
+        {if condition="$page neq $end"}
+			<a class="btn btn-secondary radius" href="/{$property}/page/{$end}.html">尾页</a>
+        {/if}
+    </div>
+</div>
+{/block}

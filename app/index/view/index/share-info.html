@@ -1,0 +1,285 @@
+﻿{extend name="index/index" /}
+{block name='title'}
+  {$article.article_title}
+{/block}
+{block name='keywords'}
+  {$article.article_title}
+{/block}
+{block name='description'}
+  {$article.article_summary}
+{/block}
+{block name='css'}
+<link href="__GETICSEN__/static/css/index/info.css" rel="stylesheet">
+<link href="/static/library/layui/css/layui.css" rel="stylesheet">
+<link rel="stylesheet" type="text/css" href="__GETICSEN__/static/library/ueditor/1.4.3/third-party/SyntaxHighlighter/styles/shCore.css">
+<link rel="stylesheet" type="text/css" href="__GETICSEN__/static/library/ueditor/1.4.3/third-party/SyntaxHighlighter/styles/shThemeFadeToGrey.css">
+{/block}
+{block name="content-left"}
+  <main style="width: 100%;">
+    <div class="infosbox">
+      <div class="newsview">
+        <h3 class="news_title">{$article.article_title}</h3>
+        <div class="bloginfo">
+          <ul>
+            <li class="author">作者：<a href="/About">{$article.author.user_name}</a></li>
+            <li class="timer">时间：{$article.article_create_time}</li>
+            <li class="view">{$article.article_view_num}人已阅读</li>
+            <li class="view">{$article.download_times}人已下载</li>
+          </ul>
+        </div>
+        <div class="news_about"><strong>简介</strong>
+          {$article.article_summary}
+        </div>
+        <div class="news_about">
+          {if condition="$loginList.isLogin eq true"}
+          <label>下载地址：</label><span id="download" style="background: #1d953f;width: auto;color: white;border-radius: 5px;font-size: 20px;margin-left:5px;padding:1px;" >点击下载</span>
+          {else/}
+          <label><h1><a href="/Login/qq">登录即可获取下载</a></h1></label>
+          {/if}
+        </div>
+        <div class="news_con code "> 
+          {$article.content}
+        </div>
+      </div>
+      <div class="share">
+        <span class="diggit" onclick="articleUp('{$article.id}')"><i class="iconfont icon-zan"> </i> <span id="up">{$article.article_up}</span></span>
+        <span class="diggit" onclick="articleDown('{$article.id}')"><i class="iconfont icon-cai"> </i><span id="down">{$article.article_down}</span></span>
+      </div>
+      <div class="nextinfo">
+      </div>
+      <div class="news_pl">
+        <h2>文章评论</h2>
+        <div class="gbko" id="comment">
+          {if condition="$loginList.isLogin eq true"}
+          <form>
+            <div id="plpost">
+              <p class="saying"><span>共有{$comments|count}条评论</span>来说两句吧...</p>
+              <textarea id="remarkEditor" name="article_comment" ></textarea>
+              <input name="imageField" type="button" onclick="submitForm('{$article.id}','{$loginList.userList.user_id}','{$loginList.userList.user_name}','{$loginList.userList.user_head_url}','{$article.author.user_id}')" value="提交">
+            </div>
+          </form>
+          {else/}
+            <div style="display: flex;justify-content: center;"><h1><a href="/Login/qq">登录即可评论</a></h1></div>
+          {/if}
+          <hr/>
+          {volist name="comments" id ="comment"}
+          <div class="fb">
+            <ul style="background: url({$comment.user.user_head}) no-repeat top 20px left 10px;background-size:50px 50px;">
+              <p class="fbtime"><span>{$comment.comment_create_time}</span>{$comment.user.user_name}</p>
+              <p class="fbinfo">{$comment.comment_content}</p>
+            </ul>
+          </div>
+          {/volist}
+        </div>
+      </div>
+    </div>
+  </main>
+{/block}
+{block name="content-right"}
+{/block}
+{block name="script"}
+<script type="text/javascript" src="__GETICSEN__/static/admin/lib/layer/2.4/layer.js"></script>
+<script type="text/javascript" src="__GETICSEN__/static/library/ueditor/1.4.3/third-party/SyntaxHighlighter/scripts/XRegExp.js"></script>
+<script type="text/javascript" src="__GETICSEN__/static/library/ueditor/1.4.3/third-party/SyntaxHighlighter/scripts/shCore.js"></script>
+<script type="text/javascript" src="__GETICSEN__/static/library/ueditor/1.4.3/third-party/SyntaxHighlighter/scripts/shBrushJava.js"></script>
+<script type="text/javascript" src="__GETICSEN__/static/library/ueditor/1.4.3/third-party/SyntaxHighlighter/scripts/shBrushJScript.js"></script>
+<script type="text/javascript" src="__GETICSEN__/static/library/ueditor/1.4.3/third-party/SyntaxHighlighter/scripts/shBrushSql.js"></script>
+<script type="text/javascript" src="__GETICSEN__/static/library/ueditor/1.4.3/third-party/SyntaxHighlighter/scripts/shBrushPhp.js"></script>
+<script type="text/javascript" src="__GETICSEN__/static/library/ueditor/1.4.3/third-party/SyntaxHighlighter/scripts/shBrushPython.js"></script>
+<script type="text/javascript" src="__GETICSEN__/static/library/ueditor/1.4.3/third-party/SyntaxHighlighter/scripts/shBrushXml.js"></script>
+<script type="text/javascript" src="__GETICSEN__/static/library/ueditor/1.4.3/third-party/SyntaxHighlighter/scripts/shBrushCpp.js"></script>
+<script type="text/javascript" src="__GETICSEN__/static/library/ueditor/1.4.3/third-party/SyntaxHighlighter/scripts/shBrushCss.js"></script>
+<script>
+SyntaxHighlighter.all();
+var up=false,down=false;
+function articleUp(id){
+  if(!up){
+  	$.ajax({
+       url: '/Index/articleUp/id/'+id,
+       type: 'POST',
+			 data: {},
+			 //这两个设置项必填
+			 contentType: false,
+			 processData: false,
+          dataType: 'jsonp',
+          calback: "callback",
+          cache: false,
+          success: function (data) {
+          　　if(data['status']=='200'){
+                  layer.msg(data['msg'],{icon:1,time:1000});
+                  $("#up").text(Number($("#up").text())+1);
+                  up=true;
+              }else{
+                  layer.msg(data['msg'],{icon:2,time:1000});
+              }
+          },
+          error: function (XMLHttpRequest, textStatus, errorThrown) {
+                  console.log(XMLHttpRequest.status);
+                  console.log(XMLHttpRequest.readyState);
+                  console.log(textStatus);
+          }
+      });
+  }else{
+    layer.msg("谢谢你已经点过了",{icon:2,time:1000});
+  }
+
+}
+function articleDown(id){
+  if(!down){
+      $.ajax({
+      url: '/Index/articleDown/id/'+id,
+        type: 'POST',
+        data: {},
+        //这两个设置项必填
+        contentType: false,
+        processData: false,
+            dataType: 'jsonp',
+            calback: "callback",
+            cache: false,
+            success: function (data) {
+            　　if(data['status']=='200'){
+                    layer.msg(data['msg'],{icon:1,time:1000});
+                    $("#down").text(Number($("#down").text())+1);
+                    down=true;
+                }else{
+                    layer.msg(data['msg'],{icon:2,time:1000});
+                }
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    console.log(XMLHttpRequest.status);
+                    console.log(XMLHttpRequest.readyState);
+                    console.log(textStatus);
+            }
+    });
+  }else{
+    layer.msg("谢谢你已经点过了",{icon:2,time:1000});
+  }
+}
+$("#download").click(function(){
+  $.ajax({
+        url: '/Share/download/content/{$article.id}/isDownload/1',
+        type: 'POST',
+        data: {},
+        //这两个设置项必填
+        contentType: false,
+        processData: false,
+            dataType: 'jsonp',
+            calback: "callback",
+            cache: false,
+            success: function (data) {
+            　　if(data['status']=='200'){
+                    layer.msg(data['msg'],{icon:1,time:1000});
+                    window.location=data['data'];
+                }else{
+                    layer.msg(data['msg'],{icon:2,time:1000});
+                }
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+                    console.log(XMLHttpRequest.status);
+                    console.log(XMLHttpRequest.readyState);
+                    console.log(textStatus);
+            }
+    });
+});
+//图片添加点击事件
+$(".newsview img").click(function(){
+  //自定页
+  layer.open({
+    type: 1,
+    title:this.alt,
+    area: ['90%', '90%'],
+    closeBtn: 0, //不显示关闭按钮
+    anim: 2,
+    shadeClose: true, //开启遮罩关闭
+    content: '<img src="'+this.src+'" style="width:100%;">',
+    btn: ['关闭'],
+		btn1:function(index, layero){
+			// 按钮1的逻辑
+      layer.close(index);
+		},
+    cancel: function(){ 
+            //右上角关闭回调
+            
+            //return false 开启该代码可禁止点击该按钮关闭
+    }
+  });
+});
+</script>
+{if condition="$loginList.isLogin eq true"}
+<script type="text/javascript" src="/static/library/layui/layui.js"></script>
+<script type="text/javascript">
+  var $;
+  var layer;
+  var index;
+  var layedit;
+  layui.use(['layer', 'jquery','form','layedit'], function () {
+      $ = layui.$;
+      layer = layui.layer;
+      layedit = layui.layedit;
+
+      /**建立编辑器*/
+      index = layedit.build('remarkEditor',{
+          height: 150, //设置编辑器高度
+          tool: ['left','center','right','|','link','unlink','|','face']
+      });
+  });
+function submitForm(article_id,user_id,user_name,user_head,author_id){
+			var formData = new FormData();
+      formData.append("article_id",article_id);
+      formData.append("user_id",user_id);
+      formData.append("article_comment",layedit.getContent(index));
+			$.ajax({
+          url: '/Index/submitArticleComment',
+          type: 'POST',
+					data: formData,
+					//这两个设置项必填
+					contentType: false,
+					processData: false,
+          dataType: 'jsonp',
+          calback: "callback",
+          cache: false,
+          success: function (data) {
+          　　if(data['status']=='200'){
+                  //在原有窗口打开
+                  var d=new Date();
+                  var year=d.getFullYear();
+                  var month=change(d.getMonth()+1);
+                  var day=change(d.getDate());
+                  function change(t){
+                    if(t<10){
+                       return "0"+t;
+                    }else{
+                       return t;
+                    }
+                  }
+                  
+                  var time=year+'-'+month+'-'+day;
+                  var Oli = '<div class="fb">'+
+                              '<ul style="background: url('+user_head+') no-repeat top 20px left 10px;background-size:50px 50px;">'+
+                                '<p class="fbtime"><span>'+time+'</span>'+user_name+'</p>'+
+                                '<p class="fbinfo">'+layedit.getContent(index)+'</p>'+
+                              '</ul>'+
+                            '</div>';
+                  $("#comment").append(Oli);
+                  /**刷新编辑器*/
+                  index = layedit.build('remarkEditor',{
+                      height: 150, //设置编辑器高度
+                      tool: ['left','center','right','|','link','unlink','|','face']
+                  });
+                  layer.msg(data['msg'],{icon:1,time:1000});
+              
+              }else{
+                  layer.msg(data['msg'],{icon:2,time:1000});
+              }
+          },
+          error: function (XMLHttpRequest, textStatus, errorThrown) {
+                  console.log(XMLHttpRequest.status);
+                  console.log(XMLHttpRequest.readyState);
+                  console.log(textStatus);
+          }
+      });
+			
+}
+</script>
+{/if}
+{/block}

@@ -1,0 +1,124 @@
+﻿{extend name="index/index" /}
+{block name='title'}友链{/block}
+{block name='keywords'}geticsen的友链{/block}
+{block name='description'}geticsen网站的友情连接{/block}
+{block name='css'}
+<link href="/static/css/index/links.css" rel="stylesheet">
+<link href="/static/library/layui/css/layui.css" rel="stylesheet">
+{/block}
+{block name="content-left"}
+  <main style="width: 100%;">
+    <div class="linksbox">
+      <div class="links">
+          <h1>友情连接</h1>
+          <div >
+            <ul class="links-items">
+              {volist name="friends" id="friend"}
+              <li>
+                  <a href="{$friend.friend_link_url}" target="_blank">
+                     <img src="{$friend.friend_link_head_url}">
+                     <span>{$friend.friend_link_name}</span>
+                  </a>
+              </li>
+              {/volist}
+            </ul>
+          </div>
+      </div>
+      <h1>友链申请{$loginList.isLogin!=true?"<a href='/Login/qq'>登录后即可申请</a>":""}</h1>
+      <div class="layui-tab layui-tab-brief" style="width: 90%;margin:10px auto;">
+        {if condition="$loginList.isLogin eq true"}
+        <div class="layui-form layui-tab-content" id="LAY_ucm" style="padding: 20px 0;">
+            <div class="layui-row layui-col-space15 layui-form-item">
+               <form  enctype="multipart/form-data" class="layui-form">
+                  <div class="layui-col-md12 layui-form-item">
+                        <div class="layui-col-md12 ">
+                              <label for="L_title" class="layui-form-label">联系邮箱</label>
+                              <div class="layui-input-block">
+                                 <input type="text"  name="user_email"  value="{$user_email==''?'':$user_email}" placeholder="联系邮箱" class="layui-input">
+                              </div>
+                        </div>
+                  </div>
+                  <div class="layui-col-md12 layui-form-item">
+                        <div class="layui-col-md12 ">
+                              <label for="L_title" class="layui-form-label">网站名字</label>
+                              <div class="layui-input-block">
+                                 <input type="text"  name="friend_link_name"  placeholder="网站名字" class="layui-input">
+                              </div>
+                        </div>
+                  </div>
+                  <div class="layui-col-md12 layui-form-item">
+                        <label for="L_title" class="layui-form-label">网站地址</label>
+                        <div class="layui-input-block">
+                           <input type="text"  name="friend_link_url"  placeholder="网站地址" class="layui-input">
+                        </div>
+                  </div>
+                  <div class="layui-col-md12 layui-form-item">
+                        <label for="L_title" class="layui-form-label">网站图标</label>
+                        <div class="layui-input-block">
+                           <input type="text"  name="friend_link_head_url"  placeholder="网站图标" class="layui-input">
+                        </div>
+                  </div>
+                  <div class="layui-col-md12 layui-form-item">
+                        <div class="layui-form-item layui-form-text">
+                          <label for="L_title" class="layui-form-label" style="display: inline;">网站描述</label>
+                           <div class="layui-input-block">
+                               <textarea id="web-desc" name="friend_link_desc"   placeholder="网站描述" class="layui-textarea" style="height: 130px;padding: 0;"></textarea>
+                           </div>
+                        </div>
+                  </div>
+                  <button type="button" onclick="submitForm()" class="layui-col-md2 layui-btn layui-btn-normal" style="float: right;">提交</button>
+               </form>
+            </div>
+        </div>
+        {/if}
+      </div>
+    </div>
+  </main>
+{/block}
+{block name="content-right"}
+{/block}
+{block name="script"}
+<script type="text/javascript" src="/static/admin/lib/layer/2.4/layer.js"></script>
+<script>
+function submitForm(){
+      var inputs=$('input');
+      for(var i=0;i<inputs.length;i++){
+         if($(inputs[i]).val()==""){
+            layer.msg("请填写完整",{icon:2,time:1000});
+            return;
+         }
+      }
+		var formData = new FormData($('form')[0]);
+      _index = layer.load(1, {
+          content: "<div style='margin-left:-23px;padding-top:44px;width:120px;color:#FFF;'>正在提交....</div>",
+          shade: [0.5, '#000']
+      });
+		$.ajax({
+       url: '/Links/commit',
+       type: 'POST',
+			 data: formData,
+			 //这两个设置项必填
+			 contentType: false,
+			 processData: false,
+          dataType: 'jsonp',
+          calback: "callback",
+          cache: false,
+          success: function (data) {
+          　　if(data['status']=='200'){
+                  layer.close(_index);
+                  layer.msg(data['msg'],{icon:1,time:1000});
+                  $('form')[0].reset();
+              }else{
+                  layer.msg(data['msg'],{icon:2,time:1000});
+              }
+          },
+          error: function (XMLHttpRequest, textStatus, errorThrown) {
+                  console.log(XMLHttpRequest.status);
+                  console.log(XMLHttpRequest.readyState);
+                  console.log(textStatus);
+          }
+      });
+			
+}
+</script>
+{/block}

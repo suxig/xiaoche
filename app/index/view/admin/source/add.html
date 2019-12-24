@@ -1,0 +1,213 @@
+{extend name="common/admin" /}
+{block naem="css"}
+<link rel="stylesheet" href="/static/css/common/bootstrap/3.3.5/bootstrap.min.css">
+<link rel="stylesheet" type="text/css" href="/static/library/ueditor/1.4.3/third-party/webuploader/webuploader.css">
+<link rel="stylesheet" type="text/css" href="/static/css/webuploader.css">
+<style>
+.file-item{float: left; position: relative; width: 110px;height: 110px; margin: 0 20px 20px 0; padding: 4px;}
+.file-item .info{overflow: hidden;}
+.uploader-list{width: 100%; overflow: hidden;}
+input[type='file']{
+    display: none;
+}
+</style>
+{/block}
+{block name="admin-main"}
+<form enctype="multipart/form-data" class="form form-horizontal" id="form-article-add" style="width:130%;margin: 0;">
+    <div class="row cl">
+        <div class="formControls col-xs-8 col-sm-9">
+            <input type="text" class="input-text" autocomplete="off" value="" placeholder="文章标题" id="" name="article_title">
+        </div>
+    </div>
+    <div class="row cl">
+        <div class="formControls col-xs-4 col-sm-4"> <span class="select-box">
+            <select name="article_type" class="select">
+                {volist name="labels" id="label"}
+                <option value="{$label.id}">{$label.label_name}</option>
+                {/volist}
+            </select>
+            </span>
+         </div>
+         <div class="formControls col-xs-4 col-sm-5" sytle="display:inline;">
+             <input type="text" class="input-text" value="" placeholder="关键词" id="" name="article_key_words">
+         </div>
+    </div>
+    <div class="row cl">
+        <div class="formControls col-xs-8 col-sm-9">
+            <input type="text" class="input-text" value="0" placeholder="" placeholder="排序值" id="" name="article_view_range">
+        </div>
+    </div>
+    <div class="row cl">
+        <div class="formControls col-xs-8 col-sm-9">
+            <textarea name="article_summary" cols="" rows="" class="textarea"  placeholder="文章摘要" datatype="*10-100" dragonfly="true" nullmsg="备注不能为空！"></textarea>
+            <p class="textarea-numberbar"><em class="textarea-length">0</em>/200</p>
+        </div>
+    </div>
+    <div class="row cl">
+            <input class="btn btn-primary radius" type="button" value="选择" id="" >
+            <div class="col-xs-8 col-sm-8">
+                <input type="text" class="input-text" sytle="width:50%;" value="/static/static/img/article/zuimeiaiqing.jpg" placeholder="文章封面" id="" name="article_pic_url">
+            </div>
+    </div>
+    <div class="row cl">
+        <div class="formControls col-xs-4 col-sm-4"> <span class="select-box">
+            <select name="article_is_comment" class="select">
+                <option value="0">可以评论</option>
+                <option value="1">不可评论</option>
+            </select>
+            </span>
+         </div>
+         <div class="formControls col-xs-4 col-sm-4" sytle="display:inline;">
+             <input type="text" class="input-text" value="" placeholder="标签" id="" name="article_label">
+         </div>
+    </div>
+    <div class="row cl">
+        <!--用来存放文件信息-->
+        <div class="formControls col-xs-4 col-sm-5" sytle="display:inline;">
+             <input type="text" class="input-text" id="source_content_url" value="" placeholder="文件地址" id="" name="source_content_url">
+        </div>
+        <div class="formControls col-xs-4 col-sm-5"> 
+            <div class="form-group form-inline">
+                <div id="picker"  class="btn btn-primary radius" style="float:left">选择文件</div> &nbsp;
+                <button id="ctlBtn" type="button"  class="btn btn-default" style="padding:8px 15px;">开始上传</button>
+            </div>
+        </div>
+    </div>
+    <div class="row cl">
+        <div id="thelist" class="uploader-list formControls col-xs-8 col-sm-9"></div>
+    </div>
+    <div class="row cl">
+        <div class="formControls col-xs-8 col-sm-9"> 
+            <textarea id="editor" type="text/plain" name="article_content" style="width:100%;height:400px;" aria-placeholder="文章内容"></textarea> 
+        </div>
+    </div>
+    <div class="row cl">
+        <div class="col-xs-8 col-sm-9">
+            <button onClick="submitForm();" type="button" class="btn btn-primary radius"><i class="Hui-iconfont">&#xe632;</i> 保存并提交审核</button>
+            <button onClick="article_save();" class="btn btn-secondary radius" type="button"><i class="Hui-iconfont">&#xe632;</i> 保存草稿</button>
+            <button onClick="removeIframe();" class="btn btn-default radius" type="button">&nbsp;&nbsp;重置&nbsp;&nbsp;</button>
+        </div>
+    </div>
+</form>
+{/block}
+{block name="script"}
+<script type="text/javascript" src="/static/library/ueditor/1.4.3/ueditor.config.js"></script> 
+<script type="text/javascript" src="/static/library/ueditor/1.4.3/ueditor.parse.js"></script> 
+<script type="text/javascript" src="/static/library/ueditor/1.4.3/ueditor.all.js"> </script> 
+<script type="text/javascript" src="/static/library/ueditor/1.4.3/lang/zh-cn/zh-cn.js"></script>
+<script type="text/javascript" src="/static/library/ueditor/1.4.3/third-party/webuploader/webuploader.min.js"></script>
+<script>
+//JavaScript代码区域
+$(function(){
+		var ue = UE.getEditor('editor',{autoHeightEnabled: false});
+		
+});
+$(function(){
+	var $list = $('#thelist'),
+        $btn = $('#ctlBtn');
+    var uploaderFile = WebUploader.create({
+      resize: false, // 不压缩image     
+      swf: '/static/library/1.4.3/ueditor/third-party/webuploader/uploader.swf', // swf文件路径
+      server: '/Uploadfile', // 文件接收服务端。
+      pick: '#picker', // 选择文件的按钮。可选
+      chunked: true, //是否要分片处理大文件上传
+      chunkSize:2*1024*1024 //分片上传，每片2M，默认是5M
+    });
+    
+    // 当有文件被添加进队列的时候
+    uploaderFile.on( 'fileQueued', function( file ) {
+        $list.append( '<div id="' + file.id + '" class="item">' +
+            '<h4 class="info">' + file.name + '</h4>' +
+            '<p class="state">等待上传...</p>' +
+        '</div>' );
+    });
+    // 文件上传过程中创建进度条实时显示。
+    uploaderFile.on( 'uploadProgress', function( file, percentage ) {
+        var $li = $( '#'+file.id ),
+            $percent = $li.find('.progress .progress-bar');
+
+        // 避免重复创建
+        if ( !$percent.length ) {
+            $percent = $('<div class="progress progress-striped active">' +
+              '<div class="progress-bar" role="progressbar" style="width: 0%">' +
+              '</div>' +
+            '</div>').appendTo( $li ).find('.progress-bar');
+        }
+
+        $li.find('p.state').text('上传中');
+
+        $percent.css( 'width', percentage * 100 + '%' );
+    });
+    // 文件上传成功
+    uploaderFile.on( 'uploadSuccess', function( file ,response) {
+        console.log(response);
+        //var data  = JSON.parse(response["_raw"]);
+        
+        $( '#'+file.id ).find('p.state').text('已上传');
+        console.log( typeof response["_raw"]);
+        var str=response["_raw"].substring(response["_raw"].indexOf("https")-1,response["_raw"].indexOf("fileSuffixes")-3);
+        console.log(str.split('"').join("").split('\\').join(""));
+        //"{"success":true,"oldName":"1.bmp","filePath":"https:\/\/geticsen-cn.oss-cn-shanghai.aliyuncs.com\/user\/upload\/2019-10-25\/1.bmp","fileSuffixes":"bmp"}"
+        $("#source_content_url").val(str.split('"').join("").split('\\').join(""));
+    });
+    // 文件上传失败，显示上传出错
+    uploaderFile.on( 'uploadError', function( file ) {
+        $( '#'+file.id ).find('p.state').text('上传出错');
+    });
+    // 完成上传完
+    uploaderFile.on( 'uploadComplete', function( file ,response) {
+        $( '#'+file.id ).find('.progress').fadeOut();
+    });
+    //开始上传
+    $btn.on('click', function () {
+        if ($(this).hasClass('disabled')) {
+            return false;
+        }
+        uploaderFile.upload();
+    });
+
+});
+
+function submitForm(){
+      var inputs=$('input');
+      for(var i=0;i<inputs.length;i++){
+         if($(inputs[i]).val()==""&&i!=4){
+            layer.msg("请填写完整",{icon:2,time:1000});
+            return;
+         }
+      }
+    $("input[type='file']")[0].type="text";
+    var formData = new FormData($('form')[0]);
+    formData.append("source_content_url",$("#source_content_url").val());
+	$.ajax({
+        url: '/Admin_source/save',
+        type: 'POST',
+		data: formData,
+		//这两个设置项必填
+		contentType: false,
+		processData: false,
+        dataType: 'jsonp',
+        calback: "callback",
+        cache: false,
+        success: function (data) {
+          　　if(data['status']=='200'){
+                  //在原有窗口打开
+                  layer.msg(data['msg'],{icon:1,time:1000});
+                  setTimeout(function(){
+                       window.location.reload();;
+                  },1000);
+              
+              }else{
+                  layer.msg(data['msg'],{icon:2,time:1000});
+              }
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+                  console.log(XMLHttpRequest.status);
+                  console.log(XMLHttpRequest.readyState);
+                  console.log(textStatus);
+        }
+      });
+			
+}
+</script>
+{/block}

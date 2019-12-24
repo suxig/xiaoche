@@ -1,0 +1,50 @@
+﻿{extend name="index/index" /}
+
+{block name='content-left'}
+  <main class="l_box" style="width:100%;">
+    {volist name="books" id="item"}
+        {if condition="$item.book_pic eq null or $item.book_pic eq ''"}
+          <li>
+              <h3><a href="/Books/show/bookId/{$item.book_id}.html" target="blank">{$item.book_title}</a></h3>
+              <p>{$item.book_summary}</p>
+          </li>
+        {else/}
+          <li>
+              <span><a href="/Books/show/bookId/{$item.book_id}.html" target="blank"><img src="{$item.book_pic|backArray|backImg=###,0}"></a></span>
+              <h3><a href="/Books/show/bookId/{$item.book_id}.html" target="blank">{$item.book_title}</a></h3>
+              <p>{$item.book_summary}</p>
+          </li>
+        {/if}
+    {/volist}
+    <div class="pagelist">
+        {if condition="$page neq 1"}
+            <a  href="/{$property}/page/index/1.html" title="Total record">首页</a>&nbsp;
+        {/if}
+        {if condition="$page gt 1"}
+          <a  href="/{$property}/page/index/{$page-1}.html" title="Total record">上一页</a>&nbsp;
+        {/if}
+        {if condition="$page neq $end"}
+            <a href="/{$property}/page/index/{$page}.html"><b>{$page}</b></a>&nbsp;
+        {/if}
+        {if condition="($end -$page ) gt 6"}
+            {for start="$page+1" end="$page+6" step="1" name="i"} 
+                <a href="/{$property}/page/index/{$i}.html">{$i}</a>&nbsp;
+            {/for}
+        {else/}
+            {for start="$page+1" end="$end+1" step="1" name="i"} 
+                <a href="/{$property}/page/index/{$i}.html">{$i}</a>&nbsp;
+            {/for}
+        {/if}
+        {if condition="$page lt $end"}
+          <a href="/{$property}/page/index/{$page+1}.html">下一页</a>&nbsp;
+        {/if}
+        {if condition="$page neq $end"}
+          <a href="/{$property}/page/index/{$end}.html">尾页</a>
+        {/if}
+    </div>
+  </main>
+  {/block}
+{block name="content-right"}
+{/block}
+{block name='script'}
+{/block}

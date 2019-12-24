@@ -1,0 +1,257 @@
+{extend name="common/admin" /}
+{block name="admin-main"}
+<div class="cl pd-5 bg-1 bk-gray mt-20">
+    <span class="l">
+        <a href="javascript:;" onclick="addLabel('{$labelId==''?0:$labelId}')" class="btn btn-primary radius">
+            <i class="Hui-iconfont">&#xe600;</i> 添加标签
+        </a>
+    </span>
+    <span class="r">共有数据：<strong>{$labels|count}</strong> 条</span>
+</div>
+<table class="table table-border table-bordered table-bg">
+<tbody>
+{if condition="$labelId eq '' "}
+    <thead>
+        <tr>
+            <th class="text-c" scope="col" colspan="10">文章标签</th>
+        </tr>
+        <tr class="text-c">
+            <th class="hidden-xs">类型</th>
+            <th>名称</th>
+            <th class="hidden-xs">描述</th>
+            <th class="hidden-xs">创建时间</th>
+            <th class="hidden-xs">修改时间</th>
+            <th>热度</th>
+            <th>来自于</th>
+            <th>操作</th>
+        </tr>
+    </thead>
+    {volist name="labels" id="label"}
+        <tr class="text-c">
+            <td class="hidden-xs">{$label.label_type}</td>
+            <td><a href="/Admin_label/article/page/{$page}/labelId/{$label.id}.html">{$label.label_name}</a></td>
+            <td class="hidden-xs">{$label.label_desc}</td>
+            <td class="hidden-xs">{$label.label_create_time}</td>
+            <td class="hidden-xs">{$label.label_last_update}</td>
+            <td>{$label.label_hot}</td>
+            <td>{$label.label_from_user}</td>
+            <td class="f-14 td-manage">
+                {if condition="$label.label_status eq 1"}
+                    <a style="text-decoration:none" onClick="label_unPublish(this,'{$label.id}')" href="javascript:;" title="下架"><i class="Hui-iconfont">&#xe6de;</i></a>	
+                {else/}
+                    <a style="text-decoration:none" onClick="label_publish(this,'{$label.id}')" href="javascript:;" title="上架"><i class="Hui-iconfont">&#xe603;</i></a>	
+                {/if}
+                <a style="text-decoration:none" class="ml-5"  onclick="editLabel('{$label.id}')" title="编辑"><i class="Hui-iconfont">&#xe6df;</i></a>
+                <a style="text-decoration:none" class="ml-5" onClick="article_del(this,'{$label.id}')" href="javascript:;" title="删除"><i class="Hui-iconfont">&#xe6e2;</i></a>
+            </td>
+        </tr>
+    {/volist}
+{else /}
+    <!--子菜单 -->
+    {if condition="count($labels) eq 0 "}
+        <tr class="text-c"><td colspan="11">该菜单下没有子菜单</td></tr>
+    {else /}
+        <thead>
+            <tr>
+                <th class="text-c" scope="col" colspan="10">文章标签</th>
+            </tr>
+            <tr class="text-c">
+                <th class="hidden-xs">类型</th>
+                <th>名称</th>
+                <th>父id</th>
+                <th class="hidden-xs">描述</th>
+                <th class="hidden-xs">创建时间</th>
+                <th class="hidden-xs">修改时间</th>
+                <th>热度</th>
+                <th>来自于</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        {volist name="labels" id="label"}
+            <tr class="text-c">
+                <td class="hidden-xs">{$label.label_type}</td>
+                <td><a href="/Admin_label/article/page/{$page}/labelId/{$label.id}.html">{$label.label_name}</a></td>
+                <td>{$label.label_parent_id}</td>
+                <td class="hidden-xs">{$label.label_desc}</td>
+                <td class="hidden-xs">{$label.label_create_time}</td>
+                <td class="hidden-xs">{$label.label_last_update}</td>
+                <td>{$label.label_hot}</td>
+                <td>{$label.label_from_user}</td>
+                <td class="f-14 td-manage">
+                    {if condition="$label.label_status eq 1"}
+                        <a style="text-decoration:none" onClick="label_unPublish(this,'{$label.id}')" href="javascript:;" title="下架"><i class="Hui-iconfont">&#xe6de;</i></a>	
+                    {else/}
+                        <a style="text-decoration:none" onClick="label_publish(this,'{$label.id}')" href="javascript:;" title="上架"><i class="Hui-iconfont">&#xe603;</i></a>	
+                    {/if}
+                    <a style="text-decoration:none" class="ml-5"  onclick="editLabel('{$label.id}')" title="编辑"><i class="Hui-iconfont">&#xe6df;</i></a>
+                    <a style="text-decoration:none" class="ml-5" onClick="article_del(this,'{$label.id}')" href="javascript:;" title="删除"><i class="Hui-iconfont">&#xe6e2;</i></a>
+                </td>
+            </tr>
+        {/volist}
+    {/if}
+{/if}
+</tbody>
+</table>
+<div class="cl pd-5 bg-1 bk-gray"style="display: flex;">
+	<div style="margin:5px auto;display: flex;">
+		{if condition="$page neq 1"}
+			<a  class="btn btn-secondary radius" href="/{$property}/page/1/labelId/{$labelId}.html" title="Total record">首页</a>
+        {/if}
+        {if condition="$page gt 1"}
+			<a class="btn btn-default" href="/{$property}/page/{$page-1}/labelId/{$labelId}.html" title="Total record">上一页</a>
+        {/if}
+        {if condition="$page neq $end"}
+			<a  class="btn btn-default" href="/{$property}/page/{$page}/labelId/{$labelId}.html"><b>{$page}</b></a>
+        {/if}
+        {if condition="($end -$page ) gt 6"}
+            {for start="$page+1" end="$page+6" step="1" name="i"} 
+			<a class="btn btn-default" href="/{$property}/page/{$i}/labelId/{$labelId}.html">{$i}</a>
+            {/for}
+        {else/}
+            {for start="$page+1" end="$end+1" step="1" name="i"} 
+			<a class="btn btn-default" href="/{$property}/page/{$i}/labelId/{$labelId}.html">{$i}</a>
+            {/for}
+        {/if}
+        {if condition="$page lt $end"}
+			<a class="btn btn-default" href="/{$property}/page/{$page+1}/labelId/{$labelId}.html">下一页</a>
+        {/if}
+        {if condition="$page neq $end"}
+			<a class="btn btn-secondary radius" href="/{$property}/page/{$end}/labelId/{$labelId}.html">尾页</a>
+        {/if}
+    </div>
+</div>
+{/block}
+{block name="script"}
+<script>
+function addLabel(id){
+    layer.open({
+         title:"增加标签",
+         type: 2,
+         content: '/Admin_label/add/id/'+id   //content可以是字符串，可以是DOM，也可以是一个URL
+        ,btn: ['确认', '取消']
+        ,area: ['450px', '350px']
+        ,yes: function(index, layero){
+            //按钮【按钮一】的回调
+            var formData = new FormData($(window.frames[0].document).find("form")[0]);
+            $.ajax({
+                type: 'POST',
+                url: '/Admin_label/add/id/'+id,
+                data: formData,
+                //这两个设置项必填
+                contentType: false,
+                processData: false,
+                dataType: 'jsonp',
+			    calback: "callback",
+                success: function(data){
+                    console.log(data);
+                    layer.msg(data['msg'],{icon: 1,time:1000});
+                    layer.close(index);
+                },
+                error:function(data) {
+                    console.log(data.msg);
+                },
+            });	
+        }
+        ,no: function(index, layero){
+            //按钮【按钮二】的回调
+            layer.close(index);
+            return false
+            //return false 开启该代码可禁止点击该按钮关闭
+        }
+        ,cancel: function(){ 
+            //右上角关闭回调
+            
+            //return false 开启该代码可禁止点击该按钮关闭
+        }
+    });
+}
+function editLabel(id){
+     layer.open({
+         title:"修改标签",
+        type: 2,
+        content: '/Admin_label/edit/id/'+id   //content可以是字符串，可以是DOM，也可以是一个URL
+        ,btn: ['确认', '取消']
+        ,area: ['450px', '350px']
+        ,yes: function(index, layero){
+            //按钮【按钮一】的回调
+            var formData = new FormData($(window.frames[0].document).find("form")[0]);
+            $.ajax({
+                type: 'POST',
+                url: '/Admin_label/edit/id/'+id,
+                data: formData,
+                //这两个设置项必填
+                contentType: false,
+                processData: false,
+                dataType: 'jsonp',
+			    calback: "callback",
+                success: function(data){
+                    console.log(data);
+                    layer.msg(data['msg'],{icon: 1,time:1000});
+                    layer.close(index);
+                },
+                error:function(data) {
+                    console.log(data.msg);
+                },
+            });	
+        }
+        ,no: function(index, layero){
+            //按钮【按钮二】的回调
+            layer.close(index);
+            return false
+            //return false 开启该代码可禁止点击该按钮关闭
+        }
+        ,cancel: function(){ 
+            //右上角关闭回调
+            
+            //return false 开启该代码可禁止点击该按钮关闭
+        }
+    });
+   
+}
+function label_unPublish(obj,id){
+	layer.confirm('确认要下架吗？',function(index){
+		$.ajax({
+			type: 'POST',
+			url: '/Admin_label/unPublish/id/'+id,
+			data: {},
+			//这两个设置项必填
+			contentType: false,
+			processData: false,
+			success: function(data){
+				console.log(data);
+				$(obj).parents("tr").find(".td-manage").prepend('<a style="text-decoration:none" onClick="label_publish(this,'+id+')" href="javascript:;" title="发布"><i class="Hui-iconfont">&#xe603;</i></a>');
+				$(obj).parents("tr").find(".td-status").html('<span class="label label-defaunt radius">未发布</span>');
+				$(obj).remove();
+				layer.msg('已下架!',{icon: 5,time:1000});
+			},
+			error:function(data) {
+				console.log(data.msg);
+			},
+		});	
+	});
+}
+function label_publish(obj,id)
+{
+	layer.confirm('确认要发布吗？',function(index){
+		$.ajax({
+			type: 'POST',
+            url: '/Admin_label/publish/id/'+id,
+			data: {},
+			//这两个设置项必填
+			contentType: false,
+			processData: false,
+			success: function(data){
+				console.log(data);
+				$(obj).parents("tr").find(".td-manage").prepend('<a style="text-decoration:none" onClick="label_unPublish(this,'+id+')" href="javascript:;" title="下架"><i class="Hui-iconfont">&#xe6de;</i></a>');
+				$(obj).parents("tr").find(".td-status").html('<span class="label label-success radius">已发布</span>');
+				$(obj).remove();
+				layer.msg('已发布!',{icon: 1,time:1000});
+			},
+			error:function(data) {
+				console.log(data.msg);
+			},
+		});	
+	});
+}
+</script>
+{/block}

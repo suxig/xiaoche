@@ -1,0 +1,198 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>{block name='title'}{$title}{if condition="$page neq 1"}-第{$page}页{/if}{/block}</title>
+  <meta name="keywords" content="{block name='keywords'}{$title}{/block}" />
+  <meta name="description" content="{block name='description'}{$title}{/block}" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="__GETICSEN__/static/css/index/base.css" rel="stylesheet">
+  <link href="__GETICSEN__/static/css/index/index.css" rel="stylesheet">
+  <link href="__GETICSEN__/static/css/index/m.css" rel="stylesheet">
+  <link rel="stylesheet" href="__GETICSEN__/static/css/index/iconfont/2/iconfont.css">
+  {block name='css'}
+  <link rel="stylesheet" href="__GETICSEN__/static/library/swiper/swiper.min.css">
+  {/block}
+  <script src="__GETICSEN__/static/js/index/jquery.min.js" type="text/javascript"></script>
+  <script type="text/javascript" src="__GETICSEN__/static/js/index/comm.js"></script>
+  {block name='js'}
+  <script src="__GETICSEN__/static/library/swiper/swiper.min.js"></script>
+  {/block}
+  <!--[if lt IE 9]>
+  <script src="js/modernizr.js"></script>
+  <![endif]-->
+</head>
+<body style="height: 100%">
+<header class="header-navigation" id="header">
+  <nav><div class="logo">
+    <a href="/"><img src="/geticsen.png"></a>
+  </div>
+    <h2 id="mnavh"><span class="navicon"></span></h2>
+    <ul id="starlist">
+      {volist name="menus" id="menu"}
+        <li><a href="{$menu.menu_address}">{$menu.menu_content}</a></li>
+      {/volist}
+      {if condition="$loginList.isLogin eq false"}
+      <li><a href="/Login/qq"><i class="iconfont icon-qq"></i></a></li>
+      {else/}
+      <li class="login">
+        <img src="{$loginList.userList.user_head_url}" alt="{$loginList.userList.user_name}[退出] ">
+        <div class="content">
+            {if condition="$loginList.userList.user_authority eq 1"}
+            <span><a href="/Admin_home">[后台]</a></span>
+            {/if}
+            <span><a href="/Login/setUserOut">[退出]</a></span>
+        </div>
+      </li>
+      {/if}
+    </ul>
+</nav>
+</header>
+{block name='content'}
+<article>
+  {block name='content-left'}
+  <main class="l_box">
+    <div class="nav-swiper">
+        <!-- Swiper -->
+        <div class="swiper-container">
+          <div class="swiper-wrapper">
+              <div class="swiper-slide"><img src="__GETICSEN__/static/images/common/1.jpg"></div>
+              <div class="swiper-slide"><img src="__GETICSEN__/static/images/common/2.jpg"></div>
+              <div class="swiper-slide"><img src="__GETICSEN__/static/images/common/3.jpg"></div>
+              <div class="swiper-slide"><img src="__GETICSEN__/static/images/common/4.jpg"></div>
+          </div>
+          <!-- Add Pagination -->
+          <div class="swiper-pagination"></div>
+          <!-- Add Arrows -->
+          <div class="swiper-button-next"></div>
+          <div class="swiper-button-prev"></div>
+        </div>
+    </div>
+    {volist name="article" id="item"}
+        {if condition="$item.article_pic_url eq null or $item.article_pic_url eq ''"}
+          <li>
+              <h3><a href="/Index/article/content/{$item.id}.html" target="_blank">{$item.article_title}</a></h3>
+              <p>{$item.article_summary}</p>
+              <div class="article-footer">
+                  <i class="iconfont icon-riqi" style="color:rgb(62, 118, 240);"> {$item.article_last_update|backDate}</i>
+                  <i class="iconfont icon-chakan" style="color:rgb(62, 118, 240);"> {$item.article_view_num}</i>
+                  <i class="iconfont icon-biaoqian" style="color:rgb(62, 118, 240);" > <span style="background: #1d953f;width: auto;color: white;border-radius: 5px;font-size: 13px;margin-left:5px;padding:1px;">{$item.article_type}</span></i>
+              </div>
+          </li>
+        {else/}
+          <li>
+              <span><a href="/Index/article/content/{$item.id}.html" target="_blank"><img src="{$item.article_pic_url|backArray|backImg=###,0}"></a></span>
+              <h3><a href="/Index/article/content/{$item.id}.html" target="_blank">{$item.article_title}</a></h3>
+              <p>{$item.article_summary}</p>
+              <div class="article-footer">
+                  <i class="iconfont icon-riqi" style="color:rgb(62, 118, 240);"> {$item.article_last_update|backDate}</i>
+                  <i class="iconfont icon-chakan" style="color:rgb(62, 118, 240);"> {$item.article_view_num}</i>
+                  <i class="iconfont icon-biaoqian" style="color:rgb(62, 118, 240);" ><span style="background: #1d953f;width: auto;color: white;border-radius: 5px;font-size: 13px;margin-left:5px;padding:1px;">{$item.article_type} </span></i>
+              </div>
+          </li>
+        {/if}
+    {/volist}
+    <div class="pagelist">
+        {if condition="$page neq 1"}
+            <a  href="/{$property}/page/index/1.html" title="Total record">首页</a>&nbsp;
+        {/if}
+        {if condition="$page gt 1"}
+          <a  href="/{$property}/page/index/{$page-1}.html" title="Total record">上一页</a>&nbsp;
+        {/if}
+        {if condition="$page neq $end"}
+            <a href="/{$property}/page/index/{$page}.html"><b>{$page}</b></a>&nbsp;
+        {/if}
+        {if condition="($end -$page ) gt 6"}
+            {for start="$page+1" end="$page+6" step="1" name="i"} 
+                <a href="/{$property}/page/index/{$i}.html">{$i}</a>&nbsp;
+            {/for}
+        {else/}
+            {for start="$page+1" end="$end+1" step="1" name="i"} 
+                <a href="/{$property}/page/index/{$i}.html">{$i}</a>&nbsp;
+            {/for}
+        {/if}
+        {if condition="$page lt $end"}
+          <a href="/{$property}/page/index/{$page+1}.html">下一页</a>&nbsp;
+        {/if}
+        {if condition="$page neq $end"}
+          <a href="/{$property}/page/index/{$end}.html">尾页</a>
+        {/if}
+    </div>
+  </main>
+  {/block}
+  {block name="content-right"}
+  <aside class="r_box">
+      <div class="search">
+        <form action="/Search" method="get" name="searchform" id="searchform">
+          <input name="keywords" id="keyboard" autocomplete="off" class="input_text" value="请输入关键字词" style="color: rgb(153, 153, 153);" onfocus="if(value=='请输入关键字词'){this.style.color='#000';value=''}" onblur="if(value==''){this.style.color='#999';value='请输入关键字词'}" type="text">
+          <input class="input_submit" value="搜索" type="submit">
+        </form>
+      </div>
+      <div class="contect">
+        <ul>
+         <span><a href="https://wpa.qq.com/msgrd?v=3&uin={$host.QQ}&site=qq&menu=yes"><i class="iconfont icon-qq" style="color:#1296db;" ></i></a></span>
+         <span><a href="{$host.Github}"><i class="iconfont icon-GitHub" style="color:#000;" ></i></a></span>
+         <span><a href="#weixin"><i class="iconfont icon-weixin" style="color:#1afa29;" ></i></a></span>
+        </ul>
+      </div>
+      <div class="cloud">
+        <h2>标签云</h2>
+        <ul>
+          {volist name="labels" id="label" key="k"}
+          <a href="/Index/label/content/{$key}.html">{$label}</a>
+          {/volist}
+        </ul>
+      </div>
+      <div class="links">
+        <h2>友情链接</h2>
+        <ul>
+          {volist name="friends" id="friend"}
+              <a href="{$friend.friend_link_url}">{$friend.friend_link_name}</a>
+          {/volist}
+        </ul>
+      </div>
+      <div class="guanzhu">
+        <h2>关注我 么么哒</h2>
+        <ul>
+          <a name="weixin">
+            <img src="/static/images/common/weixin.png">
+          </a>
+        </ul>
+      </div>
+  </aside>
+  {/block}
+</article>
+{/block}
+<footer>
+  <p>Design by <a href="http://www.geticsen.cn" target="_blank">Geticsen</a> <a href="http://www.beian.miit.gov.cn"> {$host.ICP}</a></p>
+  <p>本站已运行:{$allDay}天  |  访问:{$allVisit}次</p>
+</footer>
+<a href="#" class="cd-top">Top</a>
+<!-- waifu-tips.js 依赖 JQuery 库 -->
+<script src="__GETICSEN__/static/library/jquery/jquery-3.4.1.min.js"></script>
+<!-- 实现拖动效果，需引入 JQuery UI -->
+<script src="__GETICSEN__/static/library/jquery/jquery-ui.js"></script>
+<!-- 使用 aotuload.js 引入看板娘 -->
+<script src="/static/library/live2d/autoload.js"></script>
+{block name='script'}
+<script>
+  var swiper = new Swiper('.swiper-container', {
+    spaceBetween: 30,
+    centeredSlides: true,
+    autoplay: {
+      delay: 2500,
+      disableOnInteraction: false,
+    },
+    pagination: {
+      el: '.swiper-pagination',
+      clickable: true,
+    },
+    navigation: {
+      nextEl: '.swiper-button-next',
+      prevEl: '.swiper-button-prev',
+    },
+  });
+</script>
+{/block}
+</body>
+</html>
